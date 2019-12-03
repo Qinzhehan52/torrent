@@ -2,7 +2,6 @@ package torrent
 
 import (
 	"bytes"
-	"crypto/sha1"
 	"errors"
 	"github.com/jackpal/bencode-go"
 	"log"
@@ -21,10 +20,10 @@ type MetaInfoData struct {
 	Name        string `bencode:"name"`
 	PieceLength int    `bencode:"piece length"`
 	Pieces      string `bencode:"pieces"`
-	Private     int    `bencode:"private"`
-	Length      int    `bencode:"length"`
-	Md5sum      string `bencode:"md5sum"`
-	Files       []File `bencode:"files"`
+	//	Private     int    `bencode:"private"`
+	//	Length      int    `bencode:"length"`
+	//	Md5sum      string `bencode:"md5sum"`
+	Files []File `bencode:"files"`
 }
 
 // .torrent file description. Mostly metadata about the torrent
@@ -40,7 +39,6 @@ type MetaInfo struct {
 type Torrent struct {
 	Path string
 	Data MetaInfo
-	Hash []byte
 }
 
 // NewTorrent builds a Torrent struct from the given .torrent file path
@@ -59,43 +57,25 @@ func NewTorrent(path string) (Torrent, error) {
 		return Torrent{}, errors.New("Failed to decode torrent file: " + err.Error())
 	}
 
-	log.Print("Computing torrent info hash")
-	infoHash, err := computeInfoHash(path)
-	if err != nil {
-		return Torrent{}, errors.New("Failed to compute info hash: " + err.Error())
-	}
-
 	log.Printf("Announce URL: %s", info.Announce)
-	log.Printf("Hash: %x", infoHash)
 
-	return Torrent{Path: path, Data: info, Hash: infoHash}, nil
+	return Torrent{Path: path, Data: info}, nil
 }
 
-func computeInfoHash(torrentPath string) ([]byte, error) {
-
-	file, err := os.Open(torrentPath)
+func WriteToFile(info MetaInfo, path string) error {
+	file, err := os.Create(path)
 	if err != nil {
-		return nil, errors.New("Failed to open torrent: " + err.Error())
+		return err
 	}
 	defer file.Close()
 
-	data, err := bencode.Decode(file)
-	if err != nil {
-		return nil, errors.New("Failed to decode torrent file: " + err.Error())
+	var buf bytes.Buffer
+
+	if err = bencode.Marshal(&buf, info); err != nil {
+		return err
 	}
 
-	torrentDict, ok := data.(map[string]interface{})
-	if !ok {
-		return nil, errors.New("(Torrent file is not a dictionary)")
-	}
+	_, err = file.Write(buf.Bytes())
 
-	infoBuffer := bytes.Buffer{}
-	err = bencode.Marshal(&infoBuffer, torrentDict["info"])
-	if err != nil {
-		return nil, errors.New("Failed to encode info dict: " + err.Error())
-	}
-
-	hash := sha1.New()
-	hash.Write(infoBuffer.Bytes())
-	return hash.Sum(nil), nil
+	return err
 }

@@ -2,15 +2,14 @@ package tracker
 
 import (
 	"io/ioutil"
-	"log"
 	"net/http"
 	"strings"
 )
 
-func GetTrackerList() ([]string, error) {
+func GetTrackerList() ([][]string, error) {
 	trackerListUrl := "https://raw.githubusercontent.com/ngosang/trackerslist/master/trackers_all.txt"
 	resp, err := http.Get(trackerListUrl)
-	trackerList := make([]string, 100)
+	trackerList := make([][]string, 0)
 
 	if err != nil {
 		return nil, err
@@ -22,11 +21,11 @@ func GetTrackerList() ([]string, error) {
 	}
 
 	rawTrackerList := strings.Split(string(body), "\n")
-	log.Println(string(body))
 
 	for _, url := range rawTrackerList {
 		if len(url) > 1 {
-			trackerList = append(trackerList, url)
+			tracker := []string{url}
+			trackerList = append(trackerList, tracker)
 		}
 	}
 

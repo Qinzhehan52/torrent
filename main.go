@@ -17,7 +17,7 @@ func main() {
 	torrentFile, err := torrent.NewTorrent(path)
 
 	if err != nil {
-		log.Fatal("torrent not available")
+		log.Fatalf("torrent not available: %v", err)
 	}
 
 	trackerList, err := tracker.GetTrackerList()
@@ -25,6 +25,20 @@ func main() {
 		log.Fatalf("get tracker list failed: %v", err)
 	}
 
-	torrentFile.Data.AnnounceList = append(torrentFile.Data.AnnounceList, trackerList)
+	torrentFile.Data.AnnounceList = append(torrentFile.Data.AnnounceList, trackerList...)
 	log.Println(torrentFile.Data.AnnounceList)
+
+	err = torrent.WriteToFile(torrentFile.Data, GetDstFileName(torrentFile.Data.Info.Name))
+
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func GetDstFileName(name string) string {
+	if len(os.Args) > 2 {
+		return os.Args[1]
+	} else {
+		return name + ".tracked" + ".torrent"
+	}
 }
