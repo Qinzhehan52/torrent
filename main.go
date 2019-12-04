@@ -1,10 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"torrent/torrent"
-	"torrent/tracker"
 )
 
 func main() {
@@ -14,31 +14,32 @@ func main() {
 
 	path := os.Args[1]
 
-	torrentFile, err := torrent.NewTorrent(path)
+	//name := ""
+	//
+	//if len(os.Args) > 2 {
+	//	name = os.Args[1]
+	//}
+	//
+	//torrent.AddTrackers(path, name)
+
+	info, err := torrent.NewTorrent(path)
 
 	if err != nil {
-		log.Fatalf("torrent not available: %v", err)
+		log.Printf("parse torrent failed %v", err)
+		os.Exit(1)
 	}
 
-	trackerList, err := tracker.GetTrackerList()
-	if err != nil {
-		log.Fatalf("get tracker list failed: %v", err)
-	}
+	fmt.Println(info.Data.Info.PieceLength)
+	fmt.Println(info.Data.Info.Name)
 
-	torrentFile.Data.AnnounceList = append(torrentFile.Data.AnnounceList, trackerList...)
-	log.Println(torrentFile.Data.AnnounceList)
+	//fmt.Println(info.Data.Info.Files)
 
-	err = torrent.WriteToFile(torrentFile.Data, GetDstFileName(torrentFile.Data.Info.Name))
-
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-func GetDstFileName(name string) string {
-	if len(os.Args) > 2 {
-		return os.Args[1]
-	} else {
-		return name + ".tracked" + ".torrent"
+	for _, file := range info.Data.Info.Files {
+		fmt.Print("length:")
+		fmt.Println(file.Length)
+		fmt.Print("md5sum:")
+		fmt.Println(file.Md5sum)
+		fmt.Print("path:")
+		fmt.Println(file.Path)
 	}
 }
