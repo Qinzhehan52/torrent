@@ -15,9 +15,9 @@ import (
 
 // File available as part of the torrent
 type File struct {
-	Length int    `bencode:"length"`
-	Md5sum string `bencode:"md5sum"`
-	Path   string `bencode:"path"`
+	Length int      `bencode:"length"`
+	Md5sum string   `bencode:"md5sum"`
+	Path   []string `bencode:"path"`
 }
 
 // Data about the download itself
@@ -144,15 +144,16 @@ func GetDstFileName(name string) string {
 func GetSourceInfo(path string) (*http.Response, error) {
 	info, err := NewTorrent(path)
 
-	hash := fmt.Sprintf("%x", ComputeTorrentHash(path))
-
 	if err != nil {
 		log.Fatalf("parse torrent failed: %v", err)
 	}
+
+	hash, err := ComputeTorrentHash(path)
+
 	for _, announce := range info.Data.AnnounceList {
 		for _, url := range announce {
 			strings.Replace(url, "announce", "scrape", -1)
-			url += "?info_hash=" + hash
+			url += "?info_hash=" + fmt.Sprintf("%x", hash)
 			resp, err := http.Get(url)
 			if err != nil {
 				continue
