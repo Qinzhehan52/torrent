@@ -25,10 +25,10 @@ type MetaInfoData struct {
 	Name        string `bencode:"name"`
 	PieceLength int    `bencode:"piece length"`
 	Pieces      string `bencode:"pieces"`
-	Private     int    `bencode:"private"` //不需要
-	Length      int    `bencode:"length"`  //单文件使用
-	Md5sum      string `bencode:"md5sum"`  //单文件使用
-	Files       []File `bencode:"files"`
+	//	Private     int    `bencode:"private"` //不需要
+	//	Length      int    `bencode:"length"`  //单文件使用
+	//	Md5sum      string `bencode:"md5sum"`  //单文件使用
+	Files []File `bencode:"files"`
 }
 
 // .torrent file description. Mostly metadata about the torrent
