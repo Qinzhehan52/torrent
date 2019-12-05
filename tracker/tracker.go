@@ -10,24 +10,24 @@ import (
 )
 
 func GetTrackerList() ([][]string, error) {
-	trackerListUrl := "https://raw.githubusercontent.com/ngosang/trackerslist/master/trackers_all.txt"
-	resp, _ := http.Get(trackerListUrl)
-	trackerList := make([][]string, 0)
-
 	var body []byte
 	var err error
+	//read online tracker list
+	trackerListUrl := "https://raw.githubusercontent.com/ngosang/trackerslist/master/trackers_all.txt"
+	resp, err := http.Get(trackerListUrl)
+	trackerList := make([][]string, 0)
 
-	if resp != nil {
-		body, err = ioutil.ReadAll(resp.Body)
-	} else {
+	//if failed, read local trackers
+	if err != nil || resp.StatusCode != http.StatusOK {
 		log.Println("在线获取tracker失败，读取本地缓存")
 		body, err = GetTrackListLocal()
+	} else {
+		body, err = ioutil.ReadAll(resp.Body)
 	}
 
 	if err != nil {
 		return nil, err
 	}
-
 	rawTrackerList := strings.Split(string(body), "\n")
 
 	for _, url := range rawTrackerList {
