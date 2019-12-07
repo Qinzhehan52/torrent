@@ -14,6 +14,7 @@ func Test_NewTorrent(t *testing.T) {
 
 	files := info.Data.Info.Files
 
+	t.Log(info.Data.CreationDate)
 	t.Log(files[0].Path)
 }
 
