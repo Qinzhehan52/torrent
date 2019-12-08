@@ -1,12 +1,13 @@
 package test
 
 import (
+	"os"
 	"testing"
 	"torrent/torrent"
 )
 
 func Test_NewTorrent(t *testing.T) {
-	info, err := torrent.NewTorrent("../demo2.torrent")
+	info, err := torrent.NewTorrent("../demo.torrent")
 
 	if err != nil {
 		t.Errorf("compute torrent hash %v", err)
@@ -26,4 +27,9 @@ func Test_ComputeTorrentHash(t *testing.T) {
 	}
 
 	t.Logf("%x", hash)
+}
+
+func Test_AddTrackers(t *testing.T) {
+	_ = os.Chdir("../")
+	torrent.AddTrackers("demo.torrent", "")
 }

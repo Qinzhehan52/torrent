@@ -3,7 +3,7 @@ module torrent
 go 1.13
 
 require (
-	github.com/gin-gonic/gin v1.5.0 // indirect
+	github.com/gin-gonic/gin v1.5.0
 	github.com/go-playground/universal-translator v0.17.0 // indirect
 	github.com/jackpal/bencode-go v0.0.0-20180813173944-227668e840fa
 	github.com/json-iterator/go v1.1.8 // indirect
