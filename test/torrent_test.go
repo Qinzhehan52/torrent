@@ -7,7 +7,7 @@ import (
 )
 
 func Test_NewTorrent(t *testing.T) {
-	info, err := torrent.NewTorrent("../demo.torrent")
+	info, err := torrent.NewTorrent("/Users/qinzhehan/torrent/demo.torrent")
 
 	if err != nil {
 		t.Errorf("compute torrent hash %v", err)
